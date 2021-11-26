@@ -15,6 +15,12 @@ type TagInfo struct {
 	Created  *Timestamp    `json:"created,omitempty"`
 }
 
+type TagInput struct {
+	Ref      string `json:"ref"`
+	Revision string `json:"revision,omitempty"`
+	Message  string `json:"message,omitempty"`
+}
+
 // ListTags list the tags of a project.
 //
 // Gerrit API docs: https://gerrit-review.googlesource.com/Documentation/rest-api-projects.html#list-tags
@@ -46,6 +52,23 @@ func (s *ProjectsService) GetTag(projectName, tagName string) (*TagInfo, *Respon
 	u := fmt.Sprintf("projects/%s/tags/%s", url.QueryEscape(projectName), url.QueryEscape(tagName))
 
 	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	v := new(TagInfo)
+	resp, err := s.client.Do(req, v)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return v, resp, err
+}
+
+func (s *ProjectsService) CreateTag(projectName, tagName string, input *TagInput) (*TagInfo, *Response, error) {
+	u := fmt.Sprintf("projects/%s/tags/%s", url.QueryEscape(projectName), url.QueryEscape(tagName))
+
+	req, err := s.client.NewRequest("PUT", u, input)
 	if err != nil {
 		return nil, nil, err
 	}
