@@ -387,6 +387,12 @@ type ChangeInput struct {
 	Notify            string                 `json:"notify,omitempty"`
 	NotifyDetails     string                 `json:"notify_details,omitempty"`
 }
+type MergePatchSetInput struct {
+	Subject       string      `json:"subject,omitempty"`
+	InheritParent bool        `json:"inheritParent,omitempty"`
+	BaseChange    string      `json:"base_change,omitempty"`
+	Merge         *MergeInput `json:"merge"`
+}
 
 // ChangeInfo entity contains information about a change.
 type ChangeInfo struct {
@@ -586,6 +592,23 @@ func (s *ChangesService) GetChange(changeID string, opt *ChangeOptions) (*Change
 func (s *ChangesService) GetChangeDetail(changeID string, opt *ChangeOptions) (*ChangeInfo, *Response, error) {
 	u := fmt.Sprintf("changes/%s/detail", changeID)
 	return s.getChangeInfoResponse(u, opt)
+}
+
+func (s *ChangesService) CreateMergePatchSetForChange(changeID string, mergePatchSetInput *MergePatchSetInput) (*ChangeInfo, *Response, error) {
+	u := fmt.Sprintf("changes/%s/merge", changeID)
+
+	req, err := s.client.NewRequest("POST", u, mergePatchSetInput)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	v := new(ChangeInfo)
+	resp, err := s.client.Do(req, v)
+	if err != nil {
+		return nil, resp, err
+	}
+
+	return v, resp, err
 }
 
 // getChangeInfoResponse retrieved a single ChangeInfo Response for a GET request
