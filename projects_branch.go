@@ -69,12 +69,13 @@ func (s *ProjectsService) ListBranches(projectName string, opt *BranchOptions) (
 }
 
 func (s *ProjectsService) GetMergeableInformation(projectName string, branchId string, opt *MergeInput) (*MergeableInfo, *Response, error) {
-	u := fmt.Sprintf("projects/%s/branches/%s", url.QueryEscape(projectName), url.QueryEscape(branchId))
+	u := fmt.Sprintf("projects/%s/branches/%s?source=%s&strategy=%s", url.QueryEscape(projectName), url.QueryEscape(branchId),
+		url.QueryEscape(opt.Source), url.QueryEscape(opt.Strategy))
 
-	u, err := addOptions(u, opt)
-	if err != nil {
-		return nil, nil, err
-	}
+	// u, err := addOptions(u, opt)
+	// if err != nil {
+	// 	return nil, nil, err
+	// }
 
 	req, err := s.client.NewRequest("GET", u, nil)
 	if err != nil {
