@@ -68,6 +68,27 @@ func (s *ProjectsService) ListBranches(projectName string, opt *BranchOptions) (
 	return v, resp, err
 }
 
+func (s *ProjectsService) GetMergeableInformation(projectName string, branchId string, opt *MergeInput) (*MergeableInfo, *Response, error) {
+	u := fmt.Sprintf("projects/%s/branches/%s", url.QueryEscape(projectName), url.QueryEscape(branchId))
+
+	u, err := addOptions(u, opt)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	req, err := s.client.NewRequest("GET", u, nil)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	v := new(MergeableInfo)
+	resp, err := s.client.Do(req, v)
+	if err != nil {
+		return nil, resp, err
+	}
+	return v, resp, err
+}
+
 // GetBranch retrieves a branch of a project.
 //
 // Gerrit API docs: https://gerrit-review.googlesource.com/Documentation/rest-api-projects.html#get-branch
